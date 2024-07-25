@@ -10,15 +10,17 @@ const contactSchema = z.object({
   phone: z.string().min(11),
 });
 
-export const saveContact = async (prevSate: any, formData: FormData) => {
-  const validatedFields = contactSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
+export const saveContact = async (formData: FormData) => {
+  // Mengubah FormData menjadi objek JavaScript
+  const data = Object.fromEntries(formData.entries());
+
+  const validatedFields = contactSchema.safeParse(data);
   if (!validatedFields.success) {
     return {
       Error: validatedFields.error.flatten().fieldErrors,
     };
   }
+
   try {
     await prisma.contact.create({
       data: {
@@ -29,34 +31,33 @@ export const saveContact = async (prevSate: any, formData: FormData) => {
   } catch (error) {
     return { message: "Failed to create contact" };
   }
+
   revalidatePath("/contact");
   redirect("/contact");
 };
-
-export const updateContact = async (
-  id: string,
-  prevSate: any,
-  formData: FormData
-) => {
+export const updateContact = async (id: string, formData: FormData) => {
   const validatedFields = contactSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
+
   if (!validatedFields.success) {
     return {
       Error: validatedFields.error.flatten().fieldErrors,
     };
   }
+
   try {
     await prisma.contact.update({
+      where: { id },
       data: {
         name: validatedFields.data.name,
         phone: validatedFields.data.phone,
       },
-      where: { id: id },
     });
   } catch (error) {
-    return { message: "Failed to update contact" };
+    return { Error: { message: "Failed to update contact" } };
   }
+
   revalidatePath("/contact");
   redirect("/contact");
 };

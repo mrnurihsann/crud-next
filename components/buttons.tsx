@@ -5,6 +5,7 @@ import { IoAddSharp, IoPencil, IoTrashOutline } from "react-icons/io5";
 import { useFormStatus } from "react-dom";
 import clsx from "clsx";
 import { deleteContact } from "@/lib/action";
+
 export const Button = () => {
   return (
     <Link
@@ -39,23 +40,23 @@ export const DeleteButton = ({ id }: { id: string }) => {
   );
 };
 
-export const SubmitButton = ({ label }: { label: string }) => {
-  const { pending } = useFormStatus();
-
+export const SubmitButton = ({
+  label,
+  isSubmitting,
+}: {
+  label: string;
+  isSubmitting: boolean;
+}) => {
   const className = clsx(
     "text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-sm text-sm w-full px-5 py-3 text-center",
     {
-      "opacity-50 cursor-progress": pending,
+      "opacity-50 cursor-progress": isSubmitting,
     }
   );
 
   return (
-    <button className={className} type="submit" disabled={pending}>
-      {label === "save" ? (
-        <span>{pending ? "Saving..." : "Save"}</span>
-      ) : (
-        <span>{pending ? "Updating..." : "Update"}</span>
-      )}
+    <button className={className} type="submit" disabled={isSubmitting}>
+      {isSubmitting ? `${label}ing...` : label}
     </button>
   );
 };
